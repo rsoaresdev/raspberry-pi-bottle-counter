@@ -1,0 +1,2 @@
+sudo systemctl restart krones-contador
+sudo journalctl -u krones-contador -f

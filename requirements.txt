@@ -1,0 +1,8 @@
+Flask==3.0.3
+Werkzeug==3.0.3
+Jinja2==3.1.4
+MarkupSafe==2.1.5
+itsdangerous==2.2.0
+numpy==2.0.2
+pymssql==2.3.1
+RPi.GPIO==0.7.1

@@ -1,0 +1,31 @@
+# Arquivos de ambiente e configuração
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv
+venv/
+ENV/
+
+# Certificados e chaves reais (usar apenas exemplos no repositório)
+**/CERT.key
+**/CERT.crt
+!CERT.key.example
+!CERT.crt.example
+
+# Logs e backups
+*.log
+*.backup
+contador_state.backup
+*.old
+
+# Ficheiros específicos do sistema
+.DS_Store
+Thumbs.db
+
+# Pastas de IDE
+.idea/
+.vscode/
+*.swp
+*.swo 
