@@ -1619,35 +1619,47 @@ def stats_thread():
 
 @log_exceptions
 def auto_pause_thread():
-    """Thread para pausar automaticamente por inatividade (10 minutos)"""
+    """Thread para pausar automaticamente às 12h e 17h"""
     global thread_running
     logging.info("Thread de pausa automática iniciada")
     
+    # Variáveis para controlar quando a última pausa foi feita
+    ultima_pausa_12h = False
+    ultima_pausa_17h = False
+    
     try:
-        ultima_contagem = contador.ContagemAtual
-        tempo_ultima_atividade = time.time()
-        
         while thread_running:
             try:
-                contagem_atual = contador.ContagemAtual
+                agora = datetime.now()
+                hora_atual = agora.hour
+                minuto_atual = agora.minute
                 
-                # Se o contador estiver ativo e não houver mudança na contagem
-                if contador.EstadoContador == 1:
-                    if contagem_atual == ultima_contagem:
-                        # Verificar tempo desde a última atividade
-                        if time.time() - tempo_ultima_atividade > 600:  # 10 minutos de inatividade
-                            if contador.pause_count():  # pause_count já fecha a porta
-                                logging.info("Contador pausado automaticamente após 10 minutos de inatividade")
-                    else:
-                        # Houve contagem, atualizar momento da última atividade
-                        tempo_ultima_atividade = time.time()
-                        ultima_contagem = contagem_atual
+                # Verificar se é hora de pausar (12:00 ou 17:00)
+                if hora_atual == 12 and minuto_atual == 0 and contador.EstadoContador == 1 and not ultima_pausa_12h:
+                    if contador.pause_count():  # pause_count já fecha a porta
+                        logging.info("Contador pausado automaticamente às 12:00h")
+                        ultima_pausa_12h = True
+                elif hora_atual == 17 and minuto_atual == 0 and contador.EstadoContador == 1 and not ultima_pausa_17h:
+                    if contador.pause_count():  # pause_count já fecha a porta
+                        logging.info("Contador pausado automaticamente às 17:00h")
+                        ultima_pausa_17h = True
+                
+                # Limpar as flags quando passar do minuto zero
+                if hora_atual == 12 and minuto_atual > 0:
+                    ultima_pausa_12h = False
+                if hora_atual == 17 and minuto_atual > 0:
+                    ultima_pausa_17h = False
+                
+                # Limpar todas as flags à meia-noite
+                if hora_atual == 0 and minuto_atual == 0:
+                    ultima_pausa_12h = False
+                    ultima_pausa_17h = False
                 
             except Exception as e:
-                logging.error(f"Erro na verificação de inatividade: {e}")
+                logging.error(f"Erro na verificação de pausa automática: {e}")
             
-            # Verificar a cada 30 segundos
-            time.sleep(30)
+            # Verificar a cada 15 segundos para não perder o momento exato
+            time.sleep(15)
     
     except Exception as outer_e:
         logging.error(f"Erro fatal na thread de pausa automática: {outer_e}")
